@@ -1,8 +1,11 @@
 import { useContext } from "react";
 import { CartContext } from "./context/CartContext";
+import { createPayment, isAuthenticated } from "./redux/actions";
 
 const ShoppingCart = () => {
   const { cartItems, addItemToCart, deleteItemToCart, deleteItemTotal } = useContext(CartContext);
+  const price = cartItems.reduce((a, b) => a + b.price * b.amount, 0)
+  const user = isAuthenticated();
   return (
     <div>
       <h1>CART:</h1>
@@ -23,9 +26,13 @@ const ShoppingCart = () => {
       }
       ) : <p>Cart empty</p>}
       <p>Total: ${cartItems.reduce((a, b) => a + b.price * b.amount, 0)}</p>
+      <button onClick={() => {
+        createPayment({ cartItems: cartItems, price: price, productId: cartItems.map(item => item.id), userId: user.usuario.id })
+        localStorage.removeItem("shoppingCart");
+      }
+      }>Buy</button>
     </div>
   )
 }
 
 export default ShoppingCart;
-

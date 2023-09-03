@@ -1,42 +1,87 @@
-const mercadopago = require('mercadopago');
+const axios = require('axios');
 
-const createOrderMP = async (req, res, next) => {
-  mercadopago.configure({
-    access_token: process.env.MERCADOPAGO_API_KEY
-  });
+const urlRedirect = "http://127.0.0.1:5173/";
 
-  const result = await mercadopago.preferences.create({
-    items: [
-      {
-        title: 'Test', // Nombre producto
-        quantity: 1,
-        currency_id: 'ARS', // Moneda a pagar (Peso argentino)
-        unit_price: 10.5 // Precio total
+const createPayment = async (item, id) => {
+  try {
+    const url = "https://api.mercadopago.com/checkout/preferences";
+    const body = {
+      items: item,
+      back_urls: {
+        failure: `http://localhost:3001/payments/failure/${id}`,
+        pending: `http://localhost:3001/payments/pending/${id}`,
+        success: `http://localhost:3001/payments/success/${id}`,
       }
-    ],
-    back_urls: {
-      success: "http://localhost:3001/success", //Transacción satisfactoria
-      failure: "http://localhost:3001/failure", //Transacción fallida
-      pending: "http://localhost:3001/pending" //Transacción pendiente
-    }
-  });
-  console.log(result);
-  const infoPayment = [
-    result.body.id,
-    result.body.init_point,
-    result.body.items
-  ]
-  res.send(infoPayment);
+    };
+    const payment = await axios.post(url, body, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.ACCESS_TOKEN}`,
+      },
+    });
+    const result = [
+      payment.data.init_point,
+      payment.data.id,
+      payment.data.items.map((e) => {
+        return e;
+      }),
+    ];
+    return result;
+  } catch (error) {
+    console.log(error);
+  };
+};
+
+const createInformationOrderWithPayment = async (req, res, next) => {
+  try {
+    const orden = await axios.post('http://localhost:3001/orders', {
+      userId: req.body.userId,
+      state: "pending",
+      date: new Date(),
+      priceOrder: req.body.price,
+      productId: req.body.productId,
+    });
+    const resultado = await createPayment(req.body.item, orden.data.id);
+    res.send(resultado);
+  } catch (error) {
+    next(error);
+  };
 };
 
 const orderSuccess = async (req, res, next) => {
   try {
-
+    const { id } = req.params;
+    await axios.put(`http://localhost:3001/orders/${id}`, { state: "completed" });
+    res.redirect(urlRedirect);
   } catch (error) {
     next(error);
-  }
-}
+  };
+};
+
+const orderPending = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await axios.put(`http://localhost:3001/orders/${id}`, { state: "pending" });
+    res.redirect(urlRedirect);
+  } catch (error) {
+    next(error);
+  };
+};
+
+const orderFailure = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await axios.put(`http://localhost:3001/orders/${id}`, { state: "canceled" });
+    res.redirect(urlRedirect);
+  } catch (error) {
+    next(error);
+  };
+};
 
 module.exports = {
-  createOrderMP
-}
+  createInformationOrderWithPayment,
+  createPayment,
+  orderSuccess,
+  orderPending,
+  orderFailure
+};

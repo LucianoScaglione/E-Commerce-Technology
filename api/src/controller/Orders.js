@@ -1,4 +1,4 @@
-const { Orders, Users, Products } = require('../db');
+const { Orders, Users } = require('../db');
 
 const findAllOrders = async (req, res, next) => {
   try {
@@ -26,19 +26,17 @@ const findOneOrder = async (req, res, next) => {
 
 const createOrder = async (req, res, next) => {
   try {
-    const { userId, date, priceOrder } = req.body;
-    const userOrder = await Users.findByPk(userId);
-    const newOrder = await Orders.create({
-      userId,
+    const user = await Users.findByPk(req.body.userId);
+    const createOrder = await Orders.create({
+      userId: req.body.userId,
       state: "pending",
-      date,
-      priceOrder,
-    })
-    req.body.productId.map(id => {
-      return newOrder.addProducts(id);
+      date: new Date(),
+      priceOrder: req.body.priceOrder,
+      productId: req.body.productId,
     });
-    await newOrder.addUsers(userOrder);
-    res.status(200).send({ msg: "Order create", data: newOrder });
+    req.body.productId.map(async e => { await createOrder.addProducts(e) });
+    await createOrder.addUsers(user);
+    res.send(createOrder);
   } catch (error) {
     next(error);
   }
@@ -47,7 +45,6 @@ const createOrder = async (req, res, next) => {
 const updateOrder = async (req, res, next) => {
   try {
     const { id } = req.params;
-    // const { state } = req.body;
     const searchOrder = await Orders.findOne({ where: { id } });
     if (searchOrder) {
       searchOrder.update({
@@ -60,8 +57,8 @@ const updateOrder = async (req, res, next) => {
     }
   } catch (error) {
     next(error);
-  }
-}
+  };
+};
 
 const deleteOrder = async (req, res, next) => {
   try {
@@ -75,13 +72,13 @@ const deleteOrder = async (req, res, next) => {
     }
   } catch (error) {
     next(error);
-  }
-}
+  };
+};
 
 module.exports = {
   findAllOrders,
   findOneOrder,
   createOrder,
   updateOrder,
-  deleteOrder
+  deleteOrder,
 }

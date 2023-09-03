@@ -162,3 +162,30 @@ export const getComments = (payload) => {
       .catch(err => null)
   }
 }
+
+export const createPayment = async (payload) => {
+  const buy = payload.cartItems.map(item => {
+    return {
+      id: item.id,
+      title: item.name,
+      description: item.name,
+      picture_url: item.image,
+      category_id: item.categorie,
+      quantity: item.amount,
+      unit_price: item.price
+    };
+  });
+  const body = {
+    item: buy,
+    userId: payload.userId,
+    productId: payload.cartItems.map(e => e.id),
+    price: payload.price
+  };
+  try {
+    const response = await axios.post('http://localhost:3001/payments', body)
+      .then(res => window.location.href = res.data[0])
+      .catch(error => console.log(error));
+  } catch (error) {
+    console.log(error);
+  };
+}
