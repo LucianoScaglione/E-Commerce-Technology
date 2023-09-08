@@ -18,6 +18,7 @@
     "react-router-dom": "^5.3.0",
     "redux": "^4.2.1",
     "redux-thunk": "^2.4.2",
+    "rsuite": "^5.39.0",
     "sweetalert": "^2.1.2"
   },
   "devDependencies": {

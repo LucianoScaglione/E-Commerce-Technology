@@ -1,0 +1,44 @@
+.buttons {
+  align-content: center;
+  width: 30px;
+  height: 30px;
+  margin: 0px 1.5px;
+  border-radius: 0px;
+  border: none;
+  background-color: #212529;
+  color: #6EA8FE;
+  font-weight: 900;
+}
+
+.container button:hover {
+  background-color: #0D6EFD;
+  color: white;
+  cursor: pointer;
+}
+
+.back {
+  width: 30px;
+  height: 30px;
+  margin: 0px 1.5px;
+  border-radius: 0px;
+  border: none;
+  background-color: #212529;
+  color: #6EA8FE;
+  font-weight: 900;
+  border-bottom-left-radius: 5px;
+  border-top-left-radius: 5px;
+}
+
+.next {
+  align-content: center;
+  width: 30px;
+  height: 30px;
+  margin: 0px 1.5px;
+  border-radius: 0px;
+  border: none;
+  background-color: #212529;
+  color: #6EA8FE;
+  font-weight: 900;
+  border-bottom-right-radius: 5px;
+  border-top-right-radius: 5px;
+}

@@ -30,6 +30,15 @@ const Shopping = ({ user }) => {
                         <p>{p.categorie}</p>
                         <p>{p.brand}</p>
                         <img src={p.image} alt='Not found' />
+                        <div>
+                          {
+                            order.state === "completed" &&
+                            <div>
+                              <input type='text' placeholder='your comment' />
+                              <input type="submit" value="Send" />
+                            </div>
+                          }
+                        </div>
                       </div>
                     )
                   })

@@ -27,28 +27,42 @@ const Home = () => {
     };
   }, [dispatch]);
   return (
-    <div>
+    <div className={style.divComponent}>
       <div>
         <NavBar />
         <Pagination
           products={products.length}
           paginated={paginated}
+          currentPage={currentPage}
         />
         <Filters
           setOrder={setOrder}
           brands={productsCopy.map(p => p.brand)} />
-        {products.length && showProducts.map(p => {
-          return (
-            <div key={p.id}>
-              <Link to={`products/${p.id}`}>
-                <h1>{p.name}</h1>
-                <img src={p.image} alt='Not found' />
-              </Link>
-              <p>${p.price}</p>
-            </div>
-          )
-        })
-        }
+        <div className={style.container}>
+          {products.length && showProducts.map(p => {
+            return (
+              <div key={p.id} className={style.containerCards}>
+                <div className={style.cards}>
+                  <Link to={`products/${p.id}`}>
+                    <h1>{p.name}</h1>
+                    <img className={style.imgCard} src={p.image} alt='Not found' />
+                  </Link>
+                  <p>${p.price}</p>
+                  <div className={style.divButton}>
+                    <img width="20" height="20" src="https://img.icons8.com/ios-filled/50/shopping-1.png" alt="shopping-1" />
+                    <button>Add to cart</button>
+                  </div>
+                </div>
+              </div>
+            )
+          })
+          }
+        </div>
+        <Pagination
+          products={products.length}
+          paginated={paginated}
+          currentPage={currentPage}
+        />
       </div>
     </div>
   )
